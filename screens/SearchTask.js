@@ -33,7 +33,7 @@ const SearchTask = (props) => {
     props.handle(value);
   };
 
-  const searchTasks = () => {
+  const searchTasks = async () => {
     let month = "0" + (date.getMonth() + 1);
     if (month.length > 2) {
       month = month[1] + month[2];
@@ -43,7 +43,7 @@ const SearchTask = (props) => {
 
     let dateTime = date.getFullYear() + "-" + month + "-" + date.getDate();
 
-    axios
+    await axios
       .post(
         `http://${host}:5000/api/v1/get-task-by-date`,
         {
@@ -58,6 +58,9 @@ const SearchTask = (props) => {
       .then((res) => {
         setDataTask(res.data.task);
         changeToken(res.headers["access-token"]);
+        if (res.data.task.length === 0) {
+          alert("No existe ninguna tarea");
+        }
       })
       .catch((error) => {
         alert("Error en la busqueda");
@@ -65,7 +68,7 @@ const SearchTask = (props) => {
 
     for (let i = 0; i < dataTask.length; i++) {
       payments.push(
-        <Text>
+        <Text key={i}>
           N# {i + 1} - {dataTask[i].type_task} - {dataTask[i].task} -{" "}
           {dataTask[i].state} - {dataTask[i].observations} -{" "}
           {dataTask[i].time_finish} - {dataTask[i].user}
